@@ -71,7 +71,7 @@
 
 ### Image Data Augmentation Techniques
 1.  Data Augmentation based on basic image manipulations
-    <Geometric transformation>
+    `Geometric transformation`
         -   Geometric transformation會有safety上的問題。例如翻轉變換可能會讓6和9出現混淆
     1.  Flipping
         -   對水平軸翻轉比垂直軸更常見，是最簡單的作法且在CIFAR-10與ImageNet上有很好的效果
@@ -100,7 +100,7 @@
         -   某些作法需要人工檢驗是否label-preserve
         -   實際場景上，使training data和testing data的分佈產生差異的部份可能不只是geometric上
 
-    <Color space transformation>
+    `Color space transformation`
     1.  過暗或過亮的image，可以在整張image上統一加減一個值
     2.  image的直方圖可以用來apply一個filter來操作color space的特徵
     3.  RGB換成grayscale可以達到更快的運算速度，但是會降低準確度
@@ -115,21 +115,21 @@
             -   如果降低pixel value，將可能看不見某些object
         -   在Image Sentiment Analysis(圖片情感分析)上，如果color space改變到blood，model可能會得到較差的表現
 
-    <Geometric versus photometric transformations>
+    `Geometric versus photometric transformations`
     1.  Taylor and Nitschke做了geometric和color space兩個方法的比較
         -   使用Caltech101 dataset的8421張256x256的照片，計算4-fold cross validation
         -   baseline 為 48，所有作法都有提升，其中以Cropping得到最好的進步
         
-    <Kernel Filters>
+    `Kernel Filters`
     1.  Kernel Filter 在 sharpen和blur image上很常使用
     2.  blur image可以讓model對motion blur有更好的抵抗力
     3.  sharpen image則可以讓model對object得到更多detail
-    `Sharpening and blurring`
+    
     -   disadvantages
         -   kernel filter在Data Augmentation中比較少見
         -   與CNN較相似，可能可以實作在convolution layer中而不是在dataset中。
 
-    <Mixing Images>
+    `Mixing Images`
     1.  將多張Images做平均取得新的Images，直覺來說應該無法達到Data Augmentation的效果
     2.  Ionue做了實驗，將一對sample出來的data作平均，得到新的data並且使用同樣的label
         -   for each image in training data
@@ -153,7 +153,7 @@
     -   Transfer learning 以及 pretraining是其他可用來學到low-level特徵的作法
         -   常用來和Mixing Images做比較
 
-    <Random Erasing>
+    `Random Erasing`
     1.  Zhong et al.從dropout regularization得到random erasing的靈感。
         -   隨機從image中拿掉一塊
     2.  Random Erasing專門設計用來對付occlusion(部份image不清楚)
@@ -173,12 +173,12 @@
         -   不總是label-preserving(8可能被擦掉變成6)
         -   Stanford Cars dataset可能會產生品牌無法辨識的情形
 
-    <A note on combining augmentation>
+    `A note on combining augmentation`
     1.  若是training data的量非常少，混合使用這些雖可得到極為膨脹的data量，但很可能會overfitting
     2.  需要考慮augmented space 的 search algorithm (Design Consideration)
 
 2.  Data Augmentation based on Deep Learning
-    <Feature Space augmentation>
+    `Feature Space augmentation`
     1.  Neural Network 可以用來將高維度的data 映射到低維度的representation
         -   map image to binary class/ nx1 vector
         -   可以從feature層開始增加data數
@@ -206,7 +206,7 @@
         -   要解釋vector data很困難
         -   auto encoder完全複製encode層，很花費時間
         -   Wong et  al. 發現data space的表現會比feature space好
-    <Adversarial training>
+    `Adversarial training`
     1.  Adversarial training 指的是使用兩個或兩個以上的model，這些model的loss function有相反的目標
     2.  Adversarial Attacking 包含了對立的 network，學習如何產生導致 mis-classification 的 images
         -   Moosavi-Dezfooli et al. 使用 DeepFool，可以用最少的 noise 來讓 image 被分錯
@@ -218,7 +218,7 @@
         -   Xie et al. 使用 DisturbLabel，在每次 iteration 中隨機變動 labels
         -   在 loss layer 加入 noise 為較少見的作法，多半都是在 hidden layer 或是 input layer
 
-    <GAN-based Data Augmentation>
+    `GAN-based Data Augmentation`
     1.  Generative modeling 指的是人工產生保留原dataset特徵的data instance
         -   Bowles et  al.指 GANs 是解鎖dataset中額外資訊的方式
         -   GAN 不是唯一的 generative model，但在運算速度和效果都相當出色
@@ -229,7 +229,7 @@
     3.  GAN 的目標是要讓 generator 生成使 discriminator 無法辨別的 images
         -   Visual Turing Test，請專家辨別 real images 以及 人造 images
 
-    <Neural Style Transfer>
+    `Neural Style Transfer`
     1.  Neural Style Transfer 操作 CNN 從image中抓出來的representation
         -   在保有原本內容的情況下，改變image的style
     
@@ -254,7 +254,7 @@
         -   需要選擇將image transfer進去的style
         -   如果styles set太小，可能會產生biases
 
-    <Meta Learning Data Augmentations>
+    `Meta Learning Data Augmentations`
     1.  Meta Learning 一般是指利用Neural Network來optimize Neural Network
         -   random search
         -   evolutionary strategy
