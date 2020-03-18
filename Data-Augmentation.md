@@ -70,7 +70,7 @@
         -   U-Net
 
 ### Image Data Augmentation Techniques
-1.  Data Augmentation based on basic image manipulations
+1.  Data Augmentation based on basic image manipulations  
     `Geometric transformation`
         -   Geometric transformation會有safety上的問題。例如翻轉變換可能會讓6和9出現混淆
     1.  Flipping
