@@ -50,6 +50,25 @@
     -   差勁的generalization ability會帶來overfitting
 
 ### Background
+1.  LeNet-5 使用 image warping 來做 Data Augmentation
+2.  Data Augmentation 也常用於 oversampling，讓 dataset 中的每個 class 的 data 量可以平衡一點
+    -   random oversampling 從 minor class 中隨機複製 images 來調整 dataset 的 ratio
+    -   SMOTE (Synthetic Minority Over-sampling Technique)
+
+3.  AlexNet 為 ImageNet 用在 CNN 上
+    -   隨機從原圖上割下 224x224 的 patches
+    -   水平翻轉、PCA color augmentation
+
+4.  GANs、Neural Style Transfer、Neural Architecture Search
+    -   DCGANs, CycleGANs, Progressively-Growing GANs
+    -   Neural Augmentation, Smart Augmentation, Auto-Augment
+
+5.  多數 Data Augmentation 都 focus 在 Image Recognition 上
+    -   但仍然能夠延伸到 Image Recognition 以外的 task，如 Object Detection
+        -   YOLO、R-CNN、fast R-CNN、faster R-CNN
+    -   Semantic Segmentation
+        -   U-Net
+
 ### Image Data Augmentation Techniques
 1.  Data Augmentation based on basic image manipulations
     <Geometric transformation>
@@ -188,11 +207,28 @@
         -   auto encoder完全複製encode層，很花費時間
         -   Wong et  al. 發現data space的表現會比feature space好
     <Adversarial training>
-    1.  
+    1.  Adversarial training 指的是使用兩個或兩個以上的model，這些model的loss function有相反的目標
+    2.  Adversarial Attacking 包含了對立的 network，學習如何產生導致 mis-classification 的 images
+        -   Moosavi-Dezfooli et al. 使用 DeepFool，可以用最少的 noise 來讓 image 被分錯
+        -   Su et  al. 發現 70.97% 的 images 只需要變動一個 pixel 就會被分錯
+    
+    3.  Adversarial attacking 可以比標準的 metric 更好地描繪出 model 的判定弱點
+
+    4.  另一種進行 Adversarial attacking 的方式為變動 training data 的 labels
+        -   Xie et al. 使用 DisturbLabel，在每次 iteration 中隨機變動 labels
+        -   在 loss layer 加入 noise 為較少見的作法，多半都是在 hidden layer 或是 input layer
+
     <GAN-based Data Augmentation>
     1.  Generative modeling 指的是人工產生保留原dataset特徵的data instance
         -   Bowles et  al.指 GANs 是解鎖dataset中額外資訊的方式
         -   GAN 不是唯一的 generative model，但在運算速度和效果都相當出色
+    2.  另一個有效的 generative modeling 為 variational auto-encoders
+        -   將 height x width x color 的 image 表示成 n x 1 的 representation 向量
+            -   較容易使用 t-SNE 的方式來達到視覺化
+    
+    3.  GAN 的目標是要讓 generator 生成使 discriminator 無法辨別的 images
+        -   Visual Turing Test，請專家辨別 real images 以及 人造 images
+
     <Neural Style Transfer>
     1.  Neural Style Transfer 操作 CNN 從image中抓出來的representation
         -   在保有原本內容的情況下，改變image的style
@@ -249,6 +285,14 @@
     5.  AutoAugment
         -   AutoAugment 為一種 Reinforcement Learning algorithm
             -   以一系列的 geometric transformations 為 search space
+
+        -   Reinforce Learning Algorithm 中的 policy 相當於是 learning algorithm 中的 strategy
+            -   policy 決定在當下的state應該採取什麼action來達成goal
+        
+        -   AutoAugment 學出一個policy
+            -   此 policy 由許多 sub-policy 組成
+            -   每個 sub-policy 都是 image transformation 或是 transformation 的量值
+            -   AutoAugment 再以 discrete search 的方式找出 augmentation 的方法
     
     -   disadvantage
         -   meta-learning的概念較新，尚未被仔細測試
@@ -259,13 +303,27 @@
     6.  Comparing Augmentations
 
 ### Design Considerations for Image Data Augmentation
-1.  Feature space augmentation
-2.  Test-time Augmentation
-3.  Curriculum Learning
-4.  Resolution Impact
-5.  Final dataset size
-6.  Alleviating class imbalance with Data Augmentation
+1.  Test-time Augmentation
+    -   在 Test-time 對 predictions 作 ensemble 來取得更好的結果
+    -   對於需要 real-time 反應的 model 可能較為不利
 
-### Discussion
-### Future Work
-### Conclusion
+2.  Curriculum Learning
+    -   隨機選擇training data之外的其他選擇方式
+        -   起始時用augmented data作訓練、fine-tune時用original data做訓練
+3.  Resolution Impact
+    -   利用更高畫質HD(1920x1080x3)、4K(3840x2160x3)的data來做訓練
+        -   目前許多時候會 downsample 畫質來取得更快的運算速度
+    -   實驗發現將高畫質和低畫質的model ensemble起來效果更好
+        -   將softmax的prediction取平均
+
+4.  Final dataset size
+    -   增大的dataset size會造成記憶體的負擔
+        -   online做可以減少記憶體存放，但是training速度會變慢
+        -   offline作需要更多記憶體存放augmented data，但training比較快
+        
+5.  Alleviating class imbalance with Data Augmentation
+    -   class imbalance 是當dataset主要都是同一個class的data時的情況
+    -   容易造成model朝majority class prediction
+    -   最簡單的解決方案是：將minor class的data作augmentation來增加minor class的size
+        -   可能會造成minor class overfitting
+        -   使用GAN來oversample data可以保持extrinsic distribution
