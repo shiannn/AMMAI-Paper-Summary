@@ -1,0 +1,220 @@
+# PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation 
+
+## Abstract
+1.  Point Cloud 是一種重要的幾何資料結構
+    -   由於此資料結構的格式較不規律，研究者多半將此資料轉換成 3D voxel grids 或是 images
+    -   然而這種作法會讓 data 變地肥大
+
+2.  本篇論文，提出一種 neural network `Point Net`
+    -   直接使用 point cloud
+    -   respect input points 的 permutation invariance
+    -   可以用統一的架構應用在 object classification、scene semantics parsing、part segmentation
+
+3.  以下將會分析並理解此 network 學到的以及為何此 network 對於 input 的 pertubation 和 corruption 能有 robust 的表現
+
+## 1. Introduction
+1.  典型的捲積架構需要高度 regular 的 input data format 來進行 weight sharing 或是 kernel optimization
+    -   如 image grid, 3D voxels
+
+2.  由於 point clouds 和 meshes 不是 regular format, 多數研究者會將它轉換成 regular 3D voxel 或是 collections of images 來送入 neural network
+    -   然而，這樣的作法會讓 data 產生不必要的膨脹，同時會破壞一些 data 原有的 invariance
+
+3.  本篇論文採用 PointNet
+    -   以 point clouds 來作為 input representation
+    -   可以避免掉 meshes 的 combinatorial irregularities 和 complexities
+
+    -   同時，PointNet 會保有 input point set `invariant to permutation` 的性質，意即 Net 的運算會有對稱性
+
+    -   更進一步，此 invariant 的特性甚至也適用於 rigit motions
+
+4.  本篇論文的 PointNet 是統一的架構
+    -   以 point clouds 作為 input
+    -   output 出所有 input point 或是 point segment/part 的 class labels
+
+    -   每個 point 都以座標(x,y,z)表示
+        -   可能會再加上法線或是其他local、global的特徵
+
+5.  本篇論文的關鍵為使用單一對稱函數 max pooling
+    -   讓 network 學到一系列的 optimization functions/criteria 來選擇 informative points 並且 encode 出選擇的原因
+
+    -   最後再以 fully connected layers 來 aggregate 學到的 optimal values 到 global descriptor
+        -   shape classification (整體 shape)
+        -   shape segmentation (per point label)
+
+6.  本篇論文能夠容易地應用到 rigid, affine transformation
+    -   因為 point transform independently
+    -   可以在使用 PointNet 之前先對 data 作正規化來提升結果
+
+7.  本篇論文提出了理論分析與實驗評估
+    -   network 可以逼近任何 continuous set function
+    -   network 學習將 point cloud 用 sparse set of key points 來 summarize
+        -   大約是 object 的輪廓
+    
+    -   分析 PointNet 對 input point 有 perturbation、missing data、outliers 能有 robust 表現的原因
+
+<Key Contribution>
+
+1.  本篇論文設計出 deep net 架構，可用於 3D unordred point set
+
+2.  本篇論文呈現出 Net 如何做到 3D shape classfication, shape part segmentation, scene semantic parsing task
+
+3.  本篇論文提供實驗依據與理論分析
+4.  本篇論文提供由 neurons 計算出的 3D 特徵並且以直覺的方式解釋它的表現
+
+## 2. Related Works
+<Point Cloud Features>
+
+1.  point cloud 的 feature 多半設計以針對特定 tasks
+    -   通常是 encode point 特定的統計性質
+    -   設計上會讓 feature 對特定 transformation 保持不變性
+    -   可分成 intrinsic, extrinsic, local, global
+
+<Deep Learning on 3D Data>
+
+1.  3D data 有多種 representations
+    -   Volumetric CNNs
+        -   使用 voxelized shapes 來進行 CNN
+        -   3D convolution 在運算資源上的需要以及 data sparsity 會限制 reolution
+    
+    -   FPNN & Vote3D
+        -   解決 sparse 的問題，但仍不適用於 large point cloud
+    
+    -   Multiview CNNs
+        -   將 3D point cloud render 成 2D image 並且嘗試用 2D conv 來進行 classify
+
+        -   能夠良好地進行 shape classification 以及 retrieval tasks
+
+        -   然而對於 scene understanding 以及其他 3D tasks 如同 point classification、shape completion 仍有待延伸
+
+    -   Spectral CNNs
+        -   將 CNN 用在 meshes 上
+        -   受限於 manifold meshes，non-isometric shapes 仍需延伸
+
+    -   Feature-based DNNs
+        -   將 3D data 利用傳統 shape feature 轉換成 vector 並用 fully connected net 來分類 shape
+        -   feature 的 representation power 仍然存在疑慮
+
+<Deep Learning on Unordered Sets>
+
+1.  從 data structure 的角度來看，point cloud 是 unordered set of vectors
+    -   大多數 deep learning 的 works 都是專注在 regular input representations，如同 sequences
+    -   針對 point sets 的 deep learning 尚無太多著墨
+
+2.  Oriol Vinyals et al 與此問題有相關研究
+    -   read-process-write network
+        -   使用 unordered input sets
+        -   呈現出能夠排序數字的能力
+    -   由於是應用在 NLP，因此約乏考慮 sets 的幾何性質
+
+## 3. Problem Statement
+1.  point cloud 可以用 3D point 的集合來表示
+    -   {Pi | i=1,...,n}
+    -   Pi 是每個點的 vector
+        -   coordinate, color, normal 等 feature channel
+        -   本篇論文以 coordinate 做討論
+
+2.  task
+    -   object classification
+        -   input point cloud 為從 scene point cloud 的 pre-segmented sample 出來的
+
+        -   network 會 output 出 k 個 score 給 k 個候選的 class
+
+    -   semantics segmentation
+        -   input 可以是 single object, sub-volume
+
+        -   network 會 output nxm 個 score 給 n 個 points。每個 point 有 m 個 semantic sub-categories
+
+## 4. Deep Learning on Point Sets
+-   本篇論文的 network 架構是從 R^n 空間 point set 性質得到啟發
+### 4.1 Properties of Point Sets in R^n
+1.  input 為歐式空間中 points 的子集合，有以下三種性質
+    -   Unordered
+        -   不同於 image 的 pixel array 或 volumetric grid 的 voxel array, point cloud 沒有特定順序
+
+        -   network 使用 N 個 3D points 必須對 N! 種排序有不變性
+
+    -   Interaction among points
+        -   points 有 distance metric
+        -   points 不是 isolated，neighboring points 會形成 meanful subset
+        -   model 要有辦法捕捉出 nearby points 形成的 local structure 以及 local structures 之間的 combinatorial interaction
+
+    -   Invariance under transformations
+        -   學到的 representation 必須對於特定 transformaion 有不變性
+        -   例如平移和轉動不會影響到 global point cloud category 以及 points 的 segmentation
+
+### 4.2 PointNe Architecture
+1.  本篇論文的 full network 架構包括 classification network 以及 segmentation network。兩者 share 許多部份的結構。
+
+2.  network 架構有3個關鍵 modules
+    -   使用 max pooling layer 作為 symmetric funciton 
+        -   從所有 points 中 aggregate information
+        -   local and global information combination structure
+        -   two joint alignment networks 來 align input points 和 point features
+
+<Symmetry Funtion for Unordered Input>
+
+1.  為了讓 model 對於 input 的排列能有不變性，有三種策略
+    -   將 input 以 canonical order 做排序
+    -   將 input 以 sequence 來 train RNN，但是對 data 以各種排列來做 data augment
+    -   使用 simple symmetric funciton 來 aggregate information
+
+-   symmetric function 將會以 n 個 vector 為輸入並且輸出一個新的 vector
+    -   無視 input 的 order
+    -   '+' 和 '*' 都是 symmetric 的 binary function
+
+2.  在高維度空間中，sorting 並不是 solution
+    -   如果 ordering strategy 存在，則將有一個 bijection map 存在高維空間和1d直線間。
+    
+    -   一般情況是無法靠著一個 mapping 就保持高維空間中的 spatial proximity 並做到 dimension reduce
+
+3.  希望能夠透過以各個排列方式訓練 RNN 以達到讓RNN 可以對 input 順序有不變性
+    -   然而，在大規模的 data 下， RNN 仍然沒辦法完全做到 robustness
+
+4.  本篇論文的方法是要用 symmetric funciton g 逼近定義在 point set 的general function f 上。
+    -   f 以 power set 2^(R^N) 為定義域，map 到 R
+        -   R^N 空間中每個點都有選和不選，形成子集合的集合 2^(R^N)
+    
+    -   h 是 Multi layer perceptron network，g 是單變數函數的 composition 以及 max pooling function
+        -   透過收集多個 h，可以學到多個 f 的 feature 並且捕捉 point set 的性質
+
+<Local and Global Information Aggregation>
+
+1.  上述函數將會 output 出 vector (f1,f2,...,fk)
+    -   此 vector 是 input set 的 global signature
+        -   可以利用 SVM/MLP 來做分類
+    
+    -   segmentation 還需要 local knowledge
+
+2.  將 global feature 連接到 per point feature 形成 combined point features
+    -   此時就同時有 local 和 global 的資訊
+
+3.  藉由此調整，model 能夠 predict per point，透過
+    -   local geometry & global semantics
+
+<Joint Alignment Network>
+
+1.  point cloud 的 semantics labeling 必須對於特定 transformation 有不變性
+    -   例如 rigid transformation
+
+### 4.3 Theoretical Analysis
+<Universal approximation>
+<Theorem 1>
+<Bottleneck dimension and stability>
+<Theorem 2>
+
+## 5. Experiment
+### 5.1 Applications
+<the 3D Object Classification>
+<Semantic Segmentation in Scenes>
+
+### 5.2 Architecture Design Analysis
+<Comparison with Alternative Order-invariant Method>
+<Effectiveness of Input and Feature Transformations>
+<Robustness Test>
+
+### 5.3 Visualizing PointNet
+
+### 5.4 Time and Space Complexity Analysis
+
+## 6. Conclusion
+<Acknowledgement>
