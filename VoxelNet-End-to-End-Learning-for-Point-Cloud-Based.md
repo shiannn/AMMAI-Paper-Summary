@@ -208,6 +208,7 @@
 -   VoxelNet Implement detail and training proceure
 ### 3.1 Network Details
 -   本篇論文的實驗以 LiDAR specification 於 KITTI dataset
+
 `Car Detection`
 
 1.  考慮 point clouds range 在 [-3,1]x[-40,40]x[0,70.4] (Z,Y,X)
