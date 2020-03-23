@@ -196,8 +196,31 @@
 1.  point cloud 的 semantics labeling 必須對於特定 transformation 有不變性
     -   例如 rigid transformation
 
+2.  將整個 input set align 到 canonical space 再做 feature extraction 是一個 solution
+    -   Jaderberg et al 利用 spatial transformer 以 sampling 和 interpolation 來 align 2D images
+
+3.  本篇論文中
+    -   以一個 mini-network (T-net) predict 一個 affine transformation matrix 並以此 matrix 對 input point 的座標進行 transformation
+
+    -   也能夠延伸到 feature space 的 alignment
+        -   feature space 的維度比 spatial transform matrix 更高，在 optimization 較為困難，因此會加上 regularization term
+            -   Lreg = ||I - AA^T||^2_F
+            -   A 為 mini-network predict 出的 feature alignment matrix
+            -   希望 A 能夠保持 orthogonal
+
 ### 4.3 Theoretical Analysis
 <Universal approximation>
+
+1.  本篇論文的 network 的 universal approximation 能力
+    -   set function 的 continuity 性質必須達到 small perturbation 不會帶來 classification 及 segmentation scores 的大影響
+
+2.  令 X = {S:S 包含於 [0,1]^m 且 S有n個元素}
+    -   f:X->R 為一個連續的set function
+        -   遵循 Hausdorff distance，任意兩個X內的點S,S'只要足夠近，則f(S)和f(S')也可以任意接近
+    
+3.  以下 Theorem 敘述
+    -   只要 max pooling layer 的 neurons 數 K 夠大，本篇論文的network可以任意逼近 f
+    
 <Theorem 1>
 <Bottleneck dimension and stability>
 <Theorem 2>
