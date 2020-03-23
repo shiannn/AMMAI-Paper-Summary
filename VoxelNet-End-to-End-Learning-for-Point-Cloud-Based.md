@@ -91,7 +91,7 @@
     -   Convolutional middle layers
     -   Region proposal network
 #### 2.1.1 Feature Learning Network
-<Voxel Partition>
+`Voxel Partition`
 
 1.  在 3D 空間中有等分開來的space voxel
 2.  Z, Y, X 3個軸上有 D, H, W 的 range
@@ -99,12 +99,12 @@
     -   3D voxel grid 的 range 就是 
         -   D'=D/vD, H'=H/vH, W'=W/vW
 
-<Grouping>
+`Grouping`
 
 1.  根據 points 落在的 voxel 來分組
 2.  LiDAR 的 points 分佈相當不均勻
     -   在分組後各個 voxel 內的 points 數量不一
-<Random Sampling>
+`Random Sampling`
 
 1.  LiDAR 的 point cloud 含有 100k 個 point 
 2.  直接處理所有 points 會帶來運算資源的負擔並且無法避免 points 分佈不一帶來的 detection bias
@@ -115,7 +115,7 @@
         -   減少 sample bias
         -   增加 training data 的多樣性
 
-<Stacked Voxel Feature Encoding>
+`Stacked Voxel Feature Encoding`
 
 1.  一個 Voxel 可以用 points 的集合來表示
     -   V = {pi = [xi,yi,zi,ri]}, i=1,...,t
@@ -133,7 +133,7 @@
     -   將cin維度 transform 到cout維度
     -   其中 linear layer 的 transform matrix 有 cin x (cout/2) 的 size。再透過 point-wise concatenation 形成 cout 維度
 
-<Sparse Tensor Representation>
+`Sparse Tensor Representation`
 
 1.  取得的 list of voxel-wise feature 可以表示為 sparse 4D tensor
     -   C x D' x H' x W' 大小
@@ -208,7 +208,7 @@
 -   VoxelNet Implement detail and training proceure
 ### 3.1 Network Details
 -   本篇論文的實驗以 LiDAR specification 於 KITTI dataset
-<Car Detection>
+`Car Detection`
 
 1.  考慮 point clouds range 在 [-3,1]x[-40,40]x[0,70.4] (Z,Y,X)
     -   忽略超出邊界的 points
@@ -238,7 +238,7 @@
     -   IoU 介於 0.45 和 0.6 之間則忽略
         -   alpha = 1.5, beta = 1
 
-<Pedestrian and Cyclist Detection>
+`Pedestrian and Cyclist Detection`
 
 1.  input 的 range 分別落在 Z,Y,X 三個軸上的 [-3,1] x [-20,20] x [0,48] 區間
     -   使用和 car detection 相同的 voxel size
