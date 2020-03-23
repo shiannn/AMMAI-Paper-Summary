@@ -268,12 +268,33 @@
     -   batch size 16 point clouds
 
 ### 3.2 Data Augmentation
+1.  少於 4000 個 Training point clouds，在本篇論文的 network 無法避免 overfitting
+    -   引入三種型式的 Data Augmentation
+    -   Augmented Data 會以 on-the-fly 的方式生成，無需佔用額外儲存空間
 
-## 4. Experiments
-### 4.1 Evaluation on KITTI Validation Set
-<Evaluation in Bird's Eye View>
+2.  定義集合 M = {pi = [xi,yi,zi,ri] 於 R^4 空間}, i=1,...,N 為整個 point cloud
+    -   包含 N 個 points
 
-<Evaluation in 3D>
+3.  定義 3D bounding box bi 為 (xc,yc,zc,l,w,h,theta)
+    -   xc,yc,zc 為 center locations
+    -   l,w,h 為長寬高
+    -   theta 為以 Z 軸為轉軸的旋轉角度
 
-### 4.2 Evaluation on KITTI Test Set
-## 5. Conclusion
+4.  定義落在 bounding box 裡的 point set 為
+    omega_i = {p|x屬於[xc-l/2, xc+l/2],y屬於[yc-w/2, yc+w/2],z屬於[zc-h/2, zc+h/2], p 屬於 M (整個point cloud)}
+    -   p = [x,y,z,r] 為落在 M 中的 point
+
+5.  第一項 Data Augmentation 對每個 ground truth 3D bounding box 作 perturbation
+    -   對 bounding box bi 連同其內的 point 集合 omega_i 作旋轉 
+    -   角度取 [-pi/10, pi/10] 區間內均勻分佈
+    -   再以 dx,dy,dz 對 bounding box bi 連同其內的 point 集合 omega_i 作平移
+    -   位移量取 Gaussian distribution (平均為0, 變異數為1)
+    -   完成 perturbation 之後再檢查所有 bounding box 是否有不合物理情況的衝突
+
+6.  第二項 Data Augmentation 對每個 ground truth boxes bi 以及全體 point cloud M 作 global scaling
+    -   對所有 M 中的 points 座標以及 bounding box bi 乘以一個 [0.95, 1.05] 中均勻分佈 sample 出來的數
+    -   提升 model 對 various size and distance 的抵抗力
+
+7.  第三項 Data Augmentation 會對整體 bounding boxes 以及 point cloud M 對 Z 軸公轉。
+    -   公轉角度為 [-pi/4, pi/4] 間的 uniform distribution
+    -   此公轉希望能夠模擬交通工具轉彎的情況
