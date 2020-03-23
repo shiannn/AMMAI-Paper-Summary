@@ -52,7 +52,7 @@
     
     -   分析 PointNet 對 input point 有 perturbation、missing data、outliers 能有 robust 表現的原因
 
-<Key Contribution>
+`Key Contribution`
 
 1.  本篇論文設計出 deep net 架構，可用於 3D unordred point set
 
@@ -62,14 +62,14 @@
 4.  本篇論文提供由 neurons 計算出的 3D 特徵並且以直覺的方式解釋它的表現
 
 ## 2. Related Works
-<Point Cloud Features>
+`Point Cloud Features`
 
 1.  point cloud 的 feature 多半設計以針對特定 tasks
     -   通常是 encode point 特定的統計性質
     -   設計上會讓 feature 對特定 transformation 保持不變性
     -   可分成 intrinsic, extrinsic, local, global
 
-<Deep Learning on 3D Data>
+`Deep Learning on 3D Data`
 
 1.  3D data 有多種 representations
     -   Volumetric CNNs
@@ -94,7 +94,7 @@
         -   將 3D data 利用傳統 shape feature 轉換成 vector 並用 fully connected net 來分類 shape
         -   feature 的 representation power 仍然存在疑慮
 
-<Deep Learning on Unordered Sets>
+`Deep Learning on Unordered Sets`
 
 1.  從 data structure 的角度來看，point cloud 是 unordered set of vectors
     -   大多數 deep learning 的 works 都是專注在 regular input representations，如同 sequences
@@ -151,7 +151,7 @@
         -   local and global information combination structure
         -   two joint alignment networks 來 align input points 和 point features
 
-<Symmetry Funtion for Unordered Input>
+`Symmetry Funtion for Unordered Input`
 
 1.  為了讓 model 對於 input 的排列能有不變性，有三種策略
     -   將 input 以 canonical order 做排序
@@ -177,7 +177,7 @@
     -   h 是 Multi layer perceptron network，g 是單變數函數的 composition 以及 max pooling function
         -   透過收集多個 h，可以學到多個 f 的 feature 並且捕捉 point set 的性質
 
-<Local and Global Information Aggregation>
+`Local and Global Information Aggregation`
 
 1.  上述函數將會 output 出 vector (f1,f2,...,fk)
     -   此 vector 是 input set 的 global signature
@@ -191,7 +191,7 @@
 3.  藉由此調整，model 能夠 predict per point，透過
     -   local geometry & global semantics
 
-<Joint Alignment Network>
+`Joint Alignment Network`
 
 1.  point cloud 的 semantics labeling 必須對於特定 transformation 有不變性
     -   例如 rigid transformation
@@ -209,7 +209,7 @@
             -   希望 A 能夠保持 orthogonal
 
 ### 4.3 Theoretical Analysis
-<Universal approximation>
+`Universal approximation`
 
 1.  本篇論文的 network 的 universal approximation 能力
     -   set function 的 continuity 性質必須達到 small perturbation 不會帶來 classification 及 segmentation scores 的大影響
@@ -220,10 +220,10 @@
     
 3.  以下 Theorem 敘述
     -   只要 max pooling layer 的 neurons 數 K 夠大，本篇論文的network可以任意逼近 f
-    
-<Theorem 1>
-<Bottleneck dimension and stability>
-<Theorem 2>
+
+`Theorem 1`
+`Bottleneck dimension and stability`
+`Theorem 2`
 
 ## 5. Experiment
 ### 5.1 Applications
