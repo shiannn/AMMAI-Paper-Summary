@@ -222,22 +222,38 @@
     -   只要 max pooling layer 的 neurons 數 K 夠大，本篇論文的network可以任意逼近 f
 
 `Theorem 1`
+
+1.  令 f:X->R 是一個連續的 set function 
+    -   Hausdorff distance dH(.,.)
+    -   對任意正數 epsilon, 都能找到一個連續函數 h 和對稱函數 g(x1,...,xn)=(gamma)(MAX) 使得對任何 S 屬於 X
+        -   f(S) 和 g(h(x)) 的距離小於 epsilon
+
+2.  意即 network 的 worst case 可以學習將 point cloud 轉換成 volumetric representation
+    -   將 space 分割成等大的 voxels
+    -   然而 network 有更 smart 的策略
+
 `Bottleneck dimension and stability`
+1.  從實驗上發現，本篇論文的 network 表示能力明顯受到 max pooling layer 的 dimension 影響
+
+2.  定義 u=MAX{h(xi)}, xi屬於S 為 f 的 sub-network
+    -   將 [0,1]^m 中的 point set mapping 到 K-dimensional vector
+    -   Theorem 2 會敘述 input set 中 small corruption 以及額外的 noise points 不會影響到 network 的 output
+
 `Theorem 2`
+1.  令 u:X->R^K 使得 u=MAX{h(xi)}, xi屬於S 且 f=(gamma)(u)
+    - (a) 對所有的S, 存在一個 Cs,Ns 包含於X
+        -   f(T)=f(S), 若 Cs包含於T包含於Ns
+    
+    - (b) Cs的元素數量小於等於K
 
-## 5. Experiment
-### 5.1 Applications
-<the 3D Object Classification>
-<Semantic Segmentation in Scenes>
+2.  此定理的解釋
+    -   (a) 表示, 對任何S
+        -   只要 Cs 的 point 都有保留住，就能有和 f(S) 相同的 output
+        -   即使多出了 Ns 的 noise point，也能有和 f(S) 相同的 output
+    
+    -   (b) 表示 Cs 只有 bounded number of points
+        -   因此 f(S) 其實可以被元素數量少於等於 K 的 finite subset Cs 包含於 S 確定
+        -   因此稱 Cs 為 S 的 critical point set, K 為 f 的 bottleneck dimension
 
-### 5.2 Architecture Design Analysis
-<Comparison with Alternative Order-invariant Method>
-<Effectiveness of Input and Feature Transformations>
-<Robustness Test>
-
-### 5.3 Visualizing PointNet
-
-### 5.4 Time and Space Complexity Analysis
-
-## 6. Conclusion
-<Acknowledgement>
+3.  此 robustness 可從 machine learning 中的 sparsity principle 中取得類比
+    -   network 學到從 sparse set of key point 中 summarize shape
