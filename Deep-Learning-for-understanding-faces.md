@@ -388,10 +388,95 @@
     
     -   deeper models
         -   wider dataset > deeper
+
 ## Performance summary
+1.  總結現今 face identification 和 verification 應用於 LFW [81]和 IJB-A [69] dataset
+
 ### LFW datasets
+1.  LFW dataset 包含 13233 face images, 5749 subjects
+    -   其中 1680 subject 有兩張以上 image
+
+2.  標準 facr verifiaction
+    -   3000 張 positive pairs 和 3000 張 negative pairs
+    -   分成十個 disjoint set, 每個 set 有 300 張 positive 300 張 negative, 作 cross validation
+
 ### IJB-A benchmark a data set
+1.  IJB-A data set 包含 500 個 subject
+    -   5397 張 images
+    -   2042 個 video 分成 20412 frames
+
+2.  face verification protocol
+    -   平均一個 split 有 1756 pos 和 9992 neg
+
+3.  face identifiction protocol 也有 10 個 split
+    -   每個 split 大約有 112 gallery template 和 1763 probe templates
+        -   1187 genuien 的 probe templates
+        -   576 impostor probe templates
+    
+    -   training set 包含 333 subjects, test set 包含 167 subjects 且沒有重複
+
+4.  IJB-A 將 image/video frames 分成 gallery 和 probe set
+    -   包含多個 templates
+    -   每個 template 包含 sample 出來 的 image 和 frame
+
+5.  IJB-A 包含 extreme pose, illumination, expression 的 images
+    -   LFW 和 YTF 則只包含 Viola Jones 的 face detector
+
 ## Facial attributes
+1.  從一個 single face, 我們能夠 identify 出 facial attributes
+    -   gender, expression, age, skin tone
+    -   這些 attribute 可用以 image retrival, emotion detection, mobile security
+
+2.  Kumar [56] 提出 image descriptor 的概念來描述 attributes
+    -   65 種 binary attributes 來描述 face image
+
+3.  Berg [56] 利用 classifiers 來生成 face verification classifier 使用的 feature
+
+4.  每個人都以和別人的相似度來描述
+    -   自動生成一系列的 attribute 而不是用 hand-label 的方式
+
+5.  現今 DCNN 已被用以進行 attribute classification
+    -   Pose Aligned Networks for Deep Attributes (PANDA)
+        -   結合 part-based models 與 Deep learning 來訓練 pose-normalized DCNNs 以成為 attribute classifier [96]
+
+    -   Liu [97] 使用兩個 DCNNs
+        -   一個用以 face detection, 另一個用以 attribute recognition
+
+6.  各個 attribute 之間其實存在著相關性
+    -   [99] 利用 attribute 之間的 correlation 來提升 image ranking 和 retrieval
+        -   以 classifier 的 output 計算 correlation
+    
+    -   Hand [100] 將 40 個 attribute 的關係以 network learn 出來, 不只是 attribute 的 pair
+
+7.  Ranjan et al. [2] 訓練加上 MTL 的 single deep network
+    -   同時可達到 face detection, facial landmark detection, face recognition, 3D head-pose etimation, gender classification, age estimation, smile detection
+
+8.  Gunther et al. [101] 提出 Alignment-Free Facial Attribute Classification Technique (AFFACT)
+    -   alignment-free facial attribute classification
+    -   利用 data augmentation 來達到不需要於 bounding box 上作 alignment 下分類 facial attributes
+
 ## MTL for facial analysis
+1.  MTL 首先由 Caruana [104] 進行分析
+2.  Zhu [55] 將其用在 face detection, landmark localization 和 head-pose estimation 上
+3.  JointCascade [105] 將 landmarks localization task 結合到 training 上
+
+4.  在 deep-learning 出現前, MTL 被限制在某些 task 上，因為不同 task 需要的 representation 不同
+    -   face detection 通常使用 HOG
+    -   face recognition 通常使用 LBPs
+    -   但現在 DCNN feature 取代了 handcrafted features, 因此通常可以訓練單一個 DCNN 來完成 multiple tasks
+
+5.  當人類在看 face in image 時, 可以 detect 到 face 在哪裡以及判斷各個 attribute。然而 machine 通常會為各個 task 分別設計獨立的演算法
+    -   但實際上可以讓所有 tasks 共用 features 並且呈現出 tasks 之間的關係
+    -   MTL 可視為一種對 DCNN 的 regularization, 讓 network 能對所有 task 都通用
+    -   HyperFace [10], Tasks-Constrained Deep Convolution Network (TCDCN) [107] 皆為 DCNN 加上 MTL
+    
 ## Open issues
-## Conclusions
+1.  Face detection
+    -   face detection 的挑戰為多變的
+        -   pose, illumination, view point, occlusions
+
+2.  Fiducial detection
+    -   DCNN 可以取出臉部較抽象的資訊，但目前尚未明瞭哪些 layers 確切對應到的 local features
+
+3.  Face identification / verification
+    -   在記憶體的限制上，如何選擇較具備 information 的 pairs/triplets 來作 training
