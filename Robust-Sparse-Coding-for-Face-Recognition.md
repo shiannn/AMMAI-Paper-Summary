@@ -19,7 +19,7 @@
     -   coding coefficient vector 的 sparsity 可以用 l0-norm 來作 measure (l0-norm 是計算vector中的非0元素數量)
     -   由於 l0-norm 為 NP-hard, l1-norm 為較接近的作法
 
-3.  一般情形下，sparse coding 可以 formulate 成
+3.  一般情形下，sparse coding 可以 formulate 成  
 ![sparse](sparse-coding/sparse-form.png)
     -   y 為給定的 signal
     -   D 為 coding atoms 的 dictionary
@@ -49,7 +49,7 @@
 
 ## 2. Robust Sparse Coding (RSC)
 ### 2.1 The RSC model
-1.  傳統 sparse coding model 與 LASSO problem 等價
+1.  傳統 sparse coding model 與 LASSO problem 等價  
 ![Lasso](sparse-coding/Lasso.png)
     -   sigma > 0 為常數
     -   y = [y1;y2;y3,...,yn] 在 Rn 空間中為需要 coded 的 signal
