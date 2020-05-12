@@ -234,7 +234,7 @@
     -   codeswords 就會以 cluster 的 center 來命名
 
 2.  此圖為 174 codewords，從 gray value pixel learn 出來
-    ![](bayesian/code.png)
+    -   ![](bayesian/code.png)
 
 ## 3. Dataset & Experimental Setup
 1.  本篇論文使用的 dataset 包含 13 個 natural scenes 的類別
