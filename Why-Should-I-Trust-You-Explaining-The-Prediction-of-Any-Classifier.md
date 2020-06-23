@@ -50,6 +50,7 @@ for text classification is a binary vector indicating the presence or absence of
 (which contains a fraction of the nonzero elements of x), recover the sample in the original representation z ∈ R^d and obtain f(z)
 
 3.  optimize following formula and get an explanation ξ(x)
-    ![](XAI/formula.png)
+
+![](XAI/formula.png)
 
 ![](XAI/LIME.png)
