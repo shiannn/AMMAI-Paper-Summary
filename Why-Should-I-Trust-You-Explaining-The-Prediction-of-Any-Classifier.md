@@ -41,7 +41,7 @@ for text classification is a binary vector indicating the presence or absence of
     -   minimize L(f, g, π x ) while having Ω(g) be low enough to be interpretable by humans
 
 3.  This formulation can be used with different explanation families G, fidelity functions L, and complexity measures Ω.
-    -   ![](XAI/formula.png)
+    ![](XAI/formula.png)
 
 #### Sampling for Local Exploration
 1.  sample instances around x' by drawing nonzero elements of x' uniformly at random (where the number of such draws is also uniformly sampled)
@@ -50,5 +50,6 @@ for text classification is a binary vector indicating the presence or absence of
 (which contains a fraction of the nonzero elements of x), recover the sample in the original representation z ∈ R^d and obtain f(z)
 
 3.  optimize following formula and get an explanation ξ(x)
-    -   ![](XAI/formula.png)
+    ![](XAI/formula.png)
+
 ![](XAI/LIME.png)
