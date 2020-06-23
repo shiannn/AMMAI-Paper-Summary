@@ -1,5 +1,11 @@
 # Model Compression and Acceleration for Deep Neural Networks
 ## Novelties, contributions, assumptions
+1.  As mentioned in the "Introduction", techniques of the four themes are orthogonal. It makes sense to combine two or three of them to maximize the compression/speedup rates. For some specific applications, like object detection, which requires both convolutional and fully connected layers, one can compress the convolutional layers with lowrank factorization and the fully connected layers with a pruning method
+
+2.  If a problem involves small or medium-size data sets, one can try the KD approaches. The compressed student model can take the benefit of transferring knowledge from the teacher model, making it a robust data set that is not large.
+
+3.  Usually, the approaches of pruning and sharing could give
+a reasonable compression rate while not hurting the accuracy. Thus, for applications that require stable model accuracy, it is better to utilize pruning and sharing.
 ## Questions and promising applications
 1.  real-time application
     -   online learning, incremental learning
